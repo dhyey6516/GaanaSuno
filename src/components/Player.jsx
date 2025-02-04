@@ -1,6 +1,5 @@
 import React, { useRef, useState, useEffect } from "react"
-// ...existing code...
-
+import { Play, Pause } from "lucide-react"
 const Player = ({ song }) => {
   const audioRef = useRef(null)
   const [isPlaying, setIsPlaying] = useState(false)
@@ -54,7 +53,7 @@ const Player = ({ song }) => {
   return (
     <div className="mt-4 p-4 border rounded">
       <h2 className="text-xl font-semibold mb-2">{song.song}</h2>
-      <p className="text-sm text-gray-600 mb-2">{song.singers}</p>
+      <p className="text-sm text-white mb-2">{song.singers}</p>
       <audio
         ref={audioRef}
         src={song.media_url}
@@ -62,8 +61,8 @@ const Player = ({ song }) => {
         onLoadedMetadata={handleLoadedMetadata}
       />
       <div className="flex items-center mb-2">
-        <button onClick={togglePlayPause} className="px-4 py-2 bg-blue-500 text-white rounded mr-2">
-          {isPlaying ? "Pause" : "Play"}
+        <button onClick={togglePlayPause} className="px-4 py-2 bg-blue-500 text-white rounded-full mr-2">
+          {isPlaying ? <Pause/> : <Play />}
         </button>
         <span className="text-sm">
           {formatTime(currentTime)} / {formatTime(duration)}
