@@ -10,7 +10,7 @@ const SongList = ({ songs, onSongSelect }) => {
           <li
             key={song.id}
             className="p-2 border rounded cursor-pointer hover:bg-gray-900 max-h-70 w-40"
-            onClick={() => onSongSelect(song)}
+            onClick={() => {onSongSelect(song); console.log(song)}}
           >
             <img src={song.image} height={120} width={120} alt=""  className="m-auto mb-5" />
             <h3 className="font-medium">{song.song}</h3>

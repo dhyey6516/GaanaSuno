@@ -1,5 +1,7 @@
 import React, { useRef, useState, useEffect } from "react"
 import { Play, Pause } from "lucide-react"
+
+
 const Player = ({ song }) => {
   const audioRef = useRef(null)
   const [isPlaying, setIsPlaying] = useState(false)
