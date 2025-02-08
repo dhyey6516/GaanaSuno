@@ -1,19 +1,19 @@
-import React, { useRef, useState, useEffect } from "react"
+import React, { useRef, useState, useEffect, useContext } from "react"
 import { Play, Pause } from "lucide-react"
+import { PlayerContext } from "../contexts/PlayerContext"
 
 
 const Player = ({ song }) => {
-  const audioRef = useRef(null)
-  const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
+  const { currentSong, isPlaying, setIsPlaying, audioRef } = useContext(PlayerContext)
 
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.play()
       setIsPlaying(true)
     }
-  }, []) // dependency adjusted
+  }, [currentSong]) // dependency adjusted
 
   const togglePlayPause = () => {
     if (audioRef.current) {
