@@ -1,76 +1,85 @@
-import React, { useRef, useState, useEffect, useContext } from "react"
-import { Play, Pause } from "lucide-react"
+import React, { useContext, useEffect, useRef } from "react"
+import AudioPlayer from "react-h5-audio-player"
+import 'react-h5-audio-player/lib/styles.css'
 import { PlayerContext } from "../contexts/PlayerContext"
-
+import './Player.css'
 
 const Player = ({ song }) => {
-  const [currentTime, setCurrentTime] = useState(0)
-  const [duration, setDuration] = useState(0)
-  const { currentSong, isPlaying, setIsPlaying, audioRef } = useContext(PlayerContext)
+  const { currentSong, setCurrentSong, isPlaying, setIsPlaying, songs, playlist, isPlaylist } = useContext(PlayerContext)
+  const playerRef = useRef(null);
+  const lastTimeRef = useRef(0);
 
+  // Save current time when source changes
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.play()
-      setIsPlaying(true)
+    if (playerRef.current) {
+      lastTimeRef.current = playerRef.current.audio.current.currentTime;
     }
-  }, [currentSong]) // dependency adjusted
+  }, [song.media_url]);
 
-  const togglePlayPause = () => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause()
-      } else {
-        audioRef.current.play()
+  // Restore time when audio is loaded
+  const handleLoadedData = () => {
+    if (playerRef.current && lastTimeRef.current > 0) {
+      playerRef.current.audio.current.currentTime = lastTimeRef.current;
+    }
+  };
+
+  const handleClickNext = () => {
+    if(isPlaylist){
+      const currentIndex = playlist.findIndex(s => s.id === currentSong.id)
+      if (currentIndex < playlist.length - 1) {
+        setCurrentSong(playlist[currentIndex + 1])
       }
-      setIsPlaying(!isPlaying)
+    }
+    else{
+      const currentIndex = songs.findIndex(s => s.id === currentSong.id)
+      if (currentIndex < songs.length - 1) {
+        setCurrentSong(songs[currentIndex + 1])
+      }
     }
   }
 
-  const handleTimeUpdate = () => {
-    if (audioRef.current) {
-      setCurrentTime(audioRef.current.currentTime)
+  const handleClickPrevious = () => {
+    if(isPlaylist){
+      const currentIndex = playlist.findIndex(s => s.id === currentSong.id)
+      if (currentIndex > 0) {
+        setCurrentSong(playlist[currentIndex - 1])
+      }
     }
-  }
-
-  const handleLoadedMetadata = () => {
-    if (audioRef.current) {
-      setDuration(audioRef.current.duration)
+    else{
+      const currentIndex = songs.findIndex(s => s.id === currentSong.id)
+      if (currentIndex > 0) {
+        setCurrentSong(songs[currentIndex - 1])
+      }
     }
-  }
-
-  const handleSeek = (e) => {
-    const time = Number(e.target.value)
-    setCurrentTime(time)
-    if (audioRef.current) {
-      audioRef.current.currentTime = time
-    }
-  }
-
-  const formatTime = (time) => {
-    const minutes = Math.floor(time / 60)
-    const seconds = Math.floor(time % 60)
-    return `${minutes}:${seconds.toString().padStart(2, "0")}`
   }
 
   return (
-    <div className="mt-4 p-4 border rounded">
-      <h2 className="text-xl font-semibold mb-2">{song.song}</h2>
-      <p className="text-sm text-white mb-2">{song.singers}</p>
-      <audio
-        ref={audioRef}
-        src={song.media_url}
-        onTimeUpdate={handleTimeUpdate}
-        onLoadedMetadata={handleLoadedMetadata}
-      />
-      <div className="flex items-center mb-2">
-        <button onClick={togglePlayPause} className="px-4 py-2 bg-blue-500 text-white rounded-full mr-2">
-          {isPlaying ? <Pause/> : <Play />}
-        </button>
-        <span className="text-sm">
-          {formatTime(currentTime)} / {formatTime(duration)}
-        </span>
+    <div className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800">
+      <div className="flex items-center px-4">
+        <div className="flex-shrink-0 w-16 h-16 mr-4">
+          <img src={song.image} alt={song.song} className="w-full h-full object-cover" />
+        </div>
+        <div className="flex-grow">
+          <AudioPlayer
+            ref={playerRef}
+            className="player-wrapper"
+            autoPlay
+            src={song.media_url}
+            onLoadedData={handleLoadedData}
+            onPlay={() => setIsPlaying(true)}
+            onPause={() => setIsPlaying(false)}
+            onClickNext={handleClickNext}
+            onClickPrevious={handleClickPrevious}
+            showSkipControls={true}
+            showJumpControls={true}
+            onEnded={handleClickNext}
+            loop={false}
+            volume={0.8}
+            progressUpdateInterval={100}
+            // ...existing customStyles and header props...
+          />
+        </div>
       </div>
-      <input type="range" min={0} max={duration} value={currentTime} onChange={handleSeek} className="w-full" />
     </div>
   )
 }

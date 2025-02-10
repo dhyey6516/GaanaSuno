@@ -23,7 +23,7 @@ function Home() {
     continuous: true,
     useLegacyResults: false
   });
-  const [songs, setSongs] = useState([])
+  const { songs, setSongs } = useContext(PlayerContext)
   const { currentSong, setCurrentSong, setPlaylist, isPlaylist, setIsPlaylist } = useContext(PlayerContext)
   const navigate = useNavigate();
 
